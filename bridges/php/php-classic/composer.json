@@ -1,0 +1,17 @@
+{
+    "name": "jonas/php-classic",
+    "description": "php-classic is a set of helper libraries for any PHP project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jonas Sciangula Street",
+            "email": "joni2back@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "PHPClassic": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
