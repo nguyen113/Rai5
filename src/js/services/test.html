@@ -1,0 +1,44 @@
+    
+
+<div>
+    <div>
+        <label for="filePicker">Choose or drag a file:</label><br>
+        <input type="file" id="filePicker">
+    </div>
+    <br>
+    <div>
+        <h1>Base64 encoded version</h1>
+        <textarea id="base64textarea" placeholder="Base64 will appear here" cols="50" rows="15"></textarea>
+    </div>
+</div>
+<script>
+
+
+
+if (window.File && window.FileReader && window.FileList && window.Blob) {
+	if(typeof(Worker) !== "undefined") {
+    	if(typeof(w) == "undefined") {
+    		if (window.File && window.FileReader && window.FileList && window.Blob) {
+    			w = new Worker("fileprocessor.js");
+    			document.getElementById('filePicker').addEventListener('change', function(e){w.postMessage(this.files);}, false);
+			} else {
+			    alert('The File APIs are not fully supported in this browser.');
+			}
+        }
+        w.onmessage = function(event) {
+        	console.log(event.data);
+            document.getElementById("base64textarea").innerHTML = event.data;
+        };
+
+		} else {
+		    // Sorry! No Web Worker support..
+		}
+	} else {
+	    alert('The File APIs are not fully supported in this browser.');
+	}
+
+
+
+
+</script>
+
