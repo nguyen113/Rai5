@@ -56,7 +56,8 @@
                     var binaryString = readerEvt.target.result;
                     //document.getElementById("base64textarea").value = btoa(binaryString);
                     //console.log(btoa(binaryString));
-                    downloadFile(btoa(binaryString));
+                    //downloadFile(btoa(binaryString));
+                    return btoa(binaryString);
                 };
 
 
@@ -66,6 +67,77 @@
 
                 console.log('Not a file');
             }
+        }
+
+
+
+        var saveByteArray = (function () {
+            var a = document.createElement("a");
+            document.body.appendChild(a);
+            a.style = "display: none";
+            return function (data, name) {
+                var blob = new Blob(data, {type: "octet/stream"}),
+                    url = window.URL.createObjectURL(blob);
+                a.href = url;
+                a.download = name;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            };
+        }());
+
+
+        function decodeBase64(base64, fileName, fileExt){
+            var binaryString =  window.atob(base64);
+            var binaryLen = binaryString.length;
+            var bytes = new Uint8Array(binaryLen);
+            for (var i = 0; i < binaryLen; i++)        {
+                var ascii = binaryString.charCodeAt(i);
+                bytes[i] = ascii;
+            }
+            saveByteArray([bytes], fileName + '.' fileExt);
+        }
+
+        //Save and upload file
+        function saveToFile(base64, serverUrl){
+            var params = {
+                file: {
+                    type: 'text/plain',
+                    filename: Path.utils.basename(currentTab.id),
+                    content: base64 /* File content goes here */
+                },
+                action: 'upload',
+                overwrite: 'true',
+                destination: '/'
+            };
+
+            var content = [];
+            for(var i in params) {
+                content.push('--' + boundary);
+
+                var mimeHeader = 'Content-Disposition: form-data; name="'+i+'"; ';
+                if(params[i].filename)
+                    mimeHeader += 'filename="'+ params[i].filename +'";';
+                content.push(mimeHeader);
+
+                if(params[i].type)
+                    content.push('Content-Type: ' + params[i].type);
+
+                content.push('');
+                content.push(params[i].content || params[i]);
+            };
+
+                /* Use your favorite toolkit here */
+                /* it should still work if you can control headers and POST raw data */
+            Ext.Ajax.request({
+                method: 'POST',
+                url: serverUrl,
+                jsonData: content.join('\r\n'),
+                headers: {
+                    'Content-Type': 'multipart/form-data; boundary=' + boundary,
+                    'Content-Length': content.length
+                }
+            });
+
         }
 
         //Function to split file to 3 equal file
